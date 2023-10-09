@@ -1,3 +1,5 @@
+using Microsoft.EntityFrameworkCore;
+using TestBlobStorage.Data;
 using TestBlobStorage.Services;
 using TestBlobStorage.Utilities;
 
@@ -12,6 +14,10 @@ builder.Services.AddSwaggerGen();
 
 builder.Services.AddTransient<IStorageManager, BlobStorageManager>();
 builder.Services.Configure<BlobStorageOptions>(builder.Configuration.GetSection("BlobStorage"));
+builder.Services.AddDbContext<ServerDbContext>(options =>
+{
+    options.UseSqlServer(builder.Configuration.GetConnectionString("AzureSql"));
+});
 
 
 var app = builder.Build();
