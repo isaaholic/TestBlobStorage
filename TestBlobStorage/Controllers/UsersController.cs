@@ -24,7 +24,7 @@ namespace TestBlobStorage.Controllers
         }
 
         [HttpPost("register")]
-        public async Task<ActionResult> RegisterUser(CreateUserDto request)
+        public async Task<ActionResult> Register(CreateUserDto request)
         {
             if (_context.Users.Any(u => u.Nickname == request.Nickname))
                 return BadRequest("Username already taken");
@@ -44,7 +44,7 @@ namespace TestBlobStorage.Controllers
         }
 
         [HttpPost("login")]
-        public async Task<ActionResult> LoginAdmin(AuthUserDto request)
+        public async Task<ActionResult> Login(AuthUserDto request)
         {
             var employee = await _context.Users.FirstOrDefaultAsync(e => e.Nickname == request.Nickname);
 
@@ -55,6 +55,12 @@ namespace TestBlobStorage.Controllers
             var token = CreateToken(employee);
 
             return Ok(token);
+        }
+
+        [HttpPost("uploadPhoto")]
+        public async Task<ActionResult> UploadImage(UpdateProfilePictureDto request)
+        {
+            
         }
 
         private void CreatePasswordHash(string password, out byte[] passwordHash, out byte[] passwordSalt)
