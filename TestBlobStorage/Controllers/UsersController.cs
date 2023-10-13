@@ -1,13 +1,5 @@
-﻿using Microsoft.AspNetCore.Http;
+﻿using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
-using Microsoft.EntityFrameworkCore;
-using Microsoft.Extensions.Configuration;
-using Microsoft.IdentityModel.Tokens;
-using System.IdentityModel.Tokens.Jwt;
-using System.Security.Claims;
-using System.Security.Cryptography;
-using TestBlobStorage.Data;
-using TestBlobStorage.Models;
 using TestBlobStorage.Models.Dto;
 using TestBlobStorage.Services;
 
@@ -54,6 +46,7 @@ namespace TestBlobStorage.Controllers
             }
         }
 
+        [Authorize]
         [HttpGet("getUser")]
         public async Task<ActionResult> GetUser(Guid userId)
         {
@@ -68,6 +61,7 @@ namespace TestBlobStorage.Controllers
         }
 
         [HttpPut("uploadPhoto")]
+        [Authorize]
         public async Task<ActionResult> UploadImage([FromForm] UpdateProfilePictureDto request)
         {
             try
@@ -81,6 +75,7 @@ namespace TestBlobStorage.Controllers
         }
 
         [HttpPut("updateUser")]
+        [Authorize]
         public async Task<ActionResult> UpdateUser(UpdateUserDto request)
         {
             try
