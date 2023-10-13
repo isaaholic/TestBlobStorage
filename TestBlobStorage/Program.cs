@@ -13,6 +13,7 @@ builder.Services.AddEndpointsApiExplorer();
 builder.Services.AddSwaggerGen();
 
 builder.Services.AddTransient<IStorageManager, BlobStorageManager>();
+builder.Services.AddTransient<IUserService, UserService>();
 builder.Services.Configure<BlobStorageOptions>(builder.Configuration.GetSection("BlobStorage"));
 builder.Services.AddDbContext<ServerDbContext>(options =>
 {
