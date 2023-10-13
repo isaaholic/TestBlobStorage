@@ -2,7 +2,7 @@
 {
     public class UpdateProfilePictureDto
     {
-        public Guid Id { get; set; }
+        public Guid UserId { get; set; }
         public IFormFile Image { get; set; }
     }
 }

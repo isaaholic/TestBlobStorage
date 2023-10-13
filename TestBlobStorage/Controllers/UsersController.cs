@@ -9,6 +9,7 @@ using System.Security.Cryptography;
 using TestBlobStorage.Data;
 using TestBlobStorage.Models;
 using TestBlobStorage.Models.Dto;
+using TestBlobStorage.Services;
 
 namespace TestBlobStorage.Controllers
 {
@@ -17,10 +18,16 @@ namespace TestBlobStorage.Controllers
     public class UsersController : ControllerBase
     {
         private readonly ServerDbContext _context;
+        private readonly IStorageManager _storageManager;
 
-        public UsersController(ServerDbContext context)
+        // isaaholic
+        // pass:Mahal2003
+        // id = 9cb1b314-cde0-4a15-4cdd-08dbc8edbedd
+
+        public UsersController(ServerDbContext context, IStorageManager storageManager)
         {
             _context = context;
+            _storageManager = storageManager;
         }
 
         [HttpPost("register")]
@@ -50,17 +57,75 @@ namespace TestBlobStorage.Controllers
 
             if (employee is null) return NotFound($"{request.Nickname} does not exist");
 
-            if (!VerifyPassword(request.Password, employee.PasswordHash, employee.PasswordSalt)) return BadRequest("Password doesn't match Admin");
+            if (!VerifyPassword(request.Password, employee.PasswordHash, employee.PasswordSalt)) return BadRequest("Password doesn't match");
 
             var token = CreateToken(employee);
 
             return Ok(token);
         }
 
-        [HttpPost("uploadPhoto")]
-        public async Task<ActionResult> UploadImage(UpdateProfilePictureDto request)
+        [HttpGet("getUser")]
+        public async Task<ActionResult> GetUser(Guid userId)
         {
-            
+            var existUser = await _context.Users.FirstOrDefaultAsync(u=>u.Id == userId);
+            if (existUser is null) return NotFound("User doesnt exists");
+
+            return Ok(existUser);
+        }
+
+        [HttpPut("uploadPhoto")]
+        public async Task<ActionResult> UploadImage([FromForm] UpdateProfilePictureDto request)
+        {
+            var existUser = await _context.Users.FirstOrDefaultAsync(u => u.Id == request.UserId);
+
+            if (existUser is null) return NotFound("user doesn't exist");
+
+            var file = request.Image;
+
+            using (var stream = file.OpenReadStream())
+            {
+                var fileName = $"{Guid.NewGuid()}{Path.GetExtension(file.FileName)}";
+                var contentType = file.ContentType;
+
+                var result = _storageManager.UploadFile(stream, fileName, contentType);
+
+                var fileUrl = _storageManager.GetSignedUrl(fileName);
+
+                if (string.IsNullOrWhiteSpace(fileUrl))
+                    return BadRequest("Something went wrong while uploading photo");
+
+                existUser.ProfilePhotoUrl = fileUrl;
+                _context.Update(existUser);
+                await _context.SaveChangesAsync();
+
+                if (result)
+                {
+                    return Ok($"File uploaded successfully. Link: {fileUrl}");
+                }
+                else
+                {
+                    return BadRequest("File upload failed.");
+                }
+            }
+
+        }
+
+        [HttpPut("updateUser")]
+        public async Task<ActionResult> UpdateUser(UpdateUserDto request)
+        {
+            var existUser = await _context.Users.FirstOrDefaultAsync(u => u.Id == request.Id);
+
+            if (existUser is null) return NotFound("user doesn't exist");
+
+            existUser.Name = request.Name;
+            existUser.Surname = request.Surname;
+            existUser.Age = request.Age;
+            existUser.Nickname = request.Nickname;
+
+            _context.Update(existUser);
+            await _context.SaveChangesAsync();
+
+            return Ok(true);
         }
 
         private void CreatePasswordHash(string password, out byte[] passwordHash, out byte[] passwordSalt)
