@@ -10,6 +10,14 @@ namespace TestBlobStorage.Data
             
         }
 
+        // Cosmos Db. If you want to use AzureSql then comment this
+        protected override void OnModelCreating(ModelBuilder modelBuilder)
+        {
+            modelBuilder.Entity<User>().ToContainer("Users");
+
+            base.OnModelCreating(modelBuilder);
+        }
+
         public DbSet<User> Users { get; set; }
     }
 }

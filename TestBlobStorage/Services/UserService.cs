@@ -37,7 +37,7 @@ namespace TestBlobStorage.Services
 
         public async Task<bool> Register(CreateUserDto request)
         {
-            if (_context.Users.Any(u => u.Nickname == request.Nickname))
+            if ((await _context.Users.FirstOrDefaultAsync(u => u.Nickname == request.Nickname)) is not null)
                 throw new ("Username already taken");
             User user = new();
             CreatePasswordHash(request.Password, out byte[] passwordHash, out byte[] passwordSalt);

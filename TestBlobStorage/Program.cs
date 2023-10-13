@@ -13,12 +13,23 @@ builder.Services.AddEndpointsApiExplorer();
 builder.Services.AddSwaggerGen();
 
 builder.Services.AddTransient<IStorageManager, BlobStorageManager>();
-builder.Services.AddTransient<IUserService, UserService>();
+builder.Services.AddScoped<IUserService, UserService>();
 builder.Services.Configure<BlobStorageOptions>(builder.Configuration.GetSection("BlobStorage"));
+// Azure SQL
+//builder.Services.AddDbContext<ServerDbContext>(options =>
+//{
+//    options.UseSqlServer(builder.Configuration.GetConnectionString("AzureSql"));
+//});
+// Cosmos
 builder.Services.AddDbContext<ServerDbContext>(options =>
 {
-    options.UseSqlServer(builder.Configuration.GetConnectionString("AzureSql"));
+    options.UseCosmos(
+                builder.Configuration["Cosmos:Uri"],
+                builder.Configuration["Cosmos:PrimaryKey"],
+                builder.Configuration["Cosmos:Database"]
+                );
 });
+builder.Services.AddDbContext<ServerDbContext>();
 
 
 var app = builder.Build();
