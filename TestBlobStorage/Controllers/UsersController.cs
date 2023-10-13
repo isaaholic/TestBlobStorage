@@ -13,7 +13,8 @@ namespace TestBlobStorage.Controllers
 
         // isaaholic
         // pass:Mahal2003
-        // id = 9cb1b314-cde0-4a15-4cdd-08dbc8edbedd
+        // id = 9cb1b314-cde0-4a15-4cdd-08dbc8edbedd AzureSql
+        // id = b39c8ff2-435d-4074-6d52-08dbcc06c1de CosmosDb
 
         public UsersController(IUserService userService)
         {
