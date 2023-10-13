@@ -86,7 +86,8 @@ namespace TestBlobStorage.Services
 
                 var result = _storageManager.UploadFile(stream, fileName, contentType);
 
-                var fileUrl = _storageManager.GetSignedUrl(fileName);
+                var fileUrl = await _storageManager.GetSadeUrlAsync(fileName);
+                var fileSignedUrl = await _storageManager.GetSignedUrlAsync(fileName);
 
                 if (string.IsNullOrWhiteSpace(fileUrl))
                     throw new ("Something went wrong while uploading photo");
@@ -97,7 +98,7 @@ namespace TestBlobStorage.Services
 
                 if (result)
                 {
-                    return fileUrl;
+                    return fileSignedUrl;
                 }
                 else
                 {

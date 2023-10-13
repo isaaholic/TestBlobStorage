@@ -56,6 +56,17 @@ namespace TestBlobStorage.Services
             return await Task.FromResult(signedUrl);
         }
 
+        public async Task<string> GetSadeUrlAsync(string fileName)
+        {
+            var serviceClient = new BlobServiceClient(_storageOptions.ConnectionString);
+            var contaionerClient = serviceClient.GetBlobContainerClient(_storageOptions.ContainerName);
+            var blobClient = contaionerClient.GetBlobClient(fileName);
+
+            var normalUrl = blobClient.Uri.AbsoluteUri;
+
+            return await Task.FromResult(normalUrl);
+        }
+
         public bool UploadFile(Stream stream, string fileName, string contentType)
         {
             var serviceClient = new BlobServiceClient(_storageOptions.ConnectionString);
